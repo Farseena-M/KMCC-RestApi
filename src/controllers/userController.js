@@ -1,8 +1,9 @@
 import Profile from "../models/profileSchema.js";
 import User from "../models/userSchema.js";
+import generateToken from "../utils/generateToken.js";
 
 
-export const SignUp = async (req, res) => {
+export const userSignUp = async (req, res) => {
     try {
         const {
             fullName,
@@ -44,6 +45,36 @@ export const SignUp = async (req, res) => {
 
 
 
+export const userLogin = async (req, res) => {
+    try {
+        const { iqamaNumber } = req.body;
+
+        if (!iqamaNumber) {
+            return res.status(400).json({ error: "Iqama number is required." });
+        }
+
+        const user = await User.findOne({ iqamaNumber });
+
+        if (!user) {
+            return res.status(404).json({ error: "User not found." });
+        }
+
+        const token = generateToken(user._id)
+
+        res.status(200).json({
+            message: "Login successful!",
+            user: user,
+            token: token
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Login failed. Please try again." });
+    }
+};
+
+
+
+
 export const getUserProfileById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -55,7 +86,7 @@ export const getUserProfileById = async (req, res) => {
 
         res.status(200).json({
             message: 'Profile retrieved successfully',
-            data: profile,
+            Profile: profile,
         });
     } catch (error) {
         console.log(error);

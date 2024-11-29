@@ -1,6 +1,5 @@
 import Profile from "../models/profileSchema.js";
 import User from "../models/userSchema.js";
-import { sendEmail } from "../utils/sendEmail.js";
 
 
 
@@ -51,11 +50,10 @@ export const profileCreation = async (req, res) => {
             areaCommittee,
             district,
             expiryDate,
-            userStatus,
+            userStatus
         });
 
         await newProfile.save();
-        await sendEmail(email,iqamaNumber);
 
         res.status(201).json({
             message: "Profile created successfully!",
