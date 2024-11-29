@@ -75,10 +75,11 @@ export const userLogin = async (req, res) => {
 
 
 
-export const getUserProfileById = async (req, res) => {
+export const getUserProfileByIqamaNumber = async (req, res) => {
     try {
-        const { id } = req.params;
-        const profile = await Profile.findById(id);
+        const { iqamaNumber } = req.params;
+
+        const profile = await Profile.findOne({ iqamaNumber });
 
         if (!profile) {
             return res.status(404).json({ message: 'Profile not found' });
@@ -86,10 +87,10 @@ export const getUserProfileById = async (req, res) => {
 
         res.status(200).json({
             message: 'Profile retrieved successfully',
-            Profile: profile,
+            profile,
         });
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({ message: 'Error retrieving profile', error });
     }
 };

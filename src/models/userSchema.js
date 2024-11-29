@@ -10,6 +10,12 @@ const userSchema = new mongoose.Schema({
     photo: { type: String },
     age: { type: Number },
     gender: { type: String, enum: ["Male", "Female"], required: true },
+    password: { type: String },
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
+    },
     termsAccepted: { type: Boolean, required: true },
 });
 
