@@ -8,4 +8,5 @@ userRouter.post('/signup', UploadImage, userSignUp)
 userRouter.post('/login', userLogin)
 userRouter.get('/profile/:iqamaNumber', Protect, restrict(['user']), getUserProfileByIqamaNumber)
 
+
 export default userRouter;
