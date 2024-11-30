@@ -123,20 +123,24 @@ export const getProfiles = async (req, res) => {
 export const getExpiredProfiles = async (req, res) => {
     try {
         const { order = "asc" } = req.query;
+        const currentDate = new Date();
 
-        const profiles = await Profile.find().sort({ expiryDate: order === "asc" ? 1 : -1 });
+        const profiles = await Profile.find({
+            expiryDate: { $lt: currentDate },
+        }).sort({ expiryDate: order === "asc" ? 1 : -1 });
 
         res.status(200).json({
-            message: "Profiles sorted by expiry date retrieved successfully.",
+            message: "Expired profiles sorted by expiry date retrieved successfully.",
             profiles,
         });
     } catch (error) {
         console.error(error);
         res.status(500).json({
-            error: "Failed to retrieve profiles.",
+            error: "Failed to retrieve expired profiles.",
         });
     }
 };
+
 
 
 
