@@ -3,7 +3,7 @@ import User from "../models/userSchema.js";
 import generateToken from "../utils/generateToken.js";
 
 
-export const userSignUp = async (req, res) => {
+/* export const userSignUp = async (req, res) => {
     try {
         const {
             fullName,
@@ -41,7 +41,7 @@ export const userSignUp = async (req, res) => {
         console.error(error);
         res.status(500).json({ error: "Failed to register user." });
     }
-}
+} */
 
 
 

@@ -1,4 +1,3 @@
-import Profile from "../models/profileSchema.js";
 import User from "../models/userSchema.js";
 import jwt from 'jsonwebtoken';
 
@@ -25,72 +24,22 @@ export const adminLogin = async (req, res) => {
 
 
 
-export const getUsers = async (req, res) => {
-    try {
-        const users = await User.find();
-        res.status(200).json({
-            message: 'Users retrieved successfully',
-            data: users,
-        });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: 'Error retrieving users', error });
-    }
-}
-
-
-
 
 export const profileCreation = async (req, res) => {
     try {
-        const {
-            iqamaNumber,
-            membershipNumber,
-            fullName,
-            centralCommittee,
-            areaCommittee,
-            district,
-            expiryDate,
-            userStatus,
-        } = req.body;
 
-        const existingProfile = await Profile.findOne({
-            $or: [{ iqamaNumber }, { membershipNumber }],
-        });
+        const iqamaNumber = req.body.iqamaNumber
+        const existingUser = await User.findOne({ iqamaNumber });
 
-        if (existingProfile) {
+        if (existingUser) {
             return res.status(400).json({
-                error: "A profile with this Iqama Number or Membership Number already exists.",
+                error: "User with this Iqama Number already exists.",
             });
         }
-
-        const isValidDate = (dateString) => {
-            const regex = /^\d{4}-\d{2}-\d{2}$/;
-            return regex.test(dateString);
-        };
-
-        if (!isValidDate(expiryDate)) {
-            return res.status(400).json({
-                error: "Invalid expiry date format. Please use YYYY-MM-DD."
-            });
-        }
-
-        const newProfile = new Profile({
-            iqamaNumber,
-            membershipNumber,
-            fullName,
-            centralCommittee,
-            areaCommittee,
-            district,
-            expiryDate,
-            userStatus
-        });
-
-        await newProfile.save();
-
+        const user = await User.create(req.body)
         res.status(201).json({
             message: "Profile created successfully!",
-            profile: newProfile,
+            profile: user,
         });
     } catch (error) {
         console.error(error);
@@ -107,7 +56,7 @@ export const profileCreation = async (req, res) => {
 
 export const getProfiles = async (req, res) => {
     try {
-        const profiles = await Profile.find();
+        const profiles = await User.find();
         res.status(200).json({
             message: 'User profile retrieved successfully',
             data: profiles,
@@ -125,7 +74,7 @@ export const getExpiredProfiles = async (req, res) => {
         const { order = "asc" } = req.query;
         const currentDate = new Date();
 
-        const profiles = await Profile.find({
+        const profiles = await User.find({
             expiryDate: { $lt: currentDate },
         }).sort({ expiryDate: order === "asc" ? 1 : -1 });
 
