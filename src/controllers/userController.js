@@ -1,70 +1,30 @@
-import Profile from "../models/profileSchema.js";
 import User from "../models/userSchema.js";
 import generateToken from "../utils/generateToken.js";
-
-
-/* export const userSignUp = async (req, res) => {
-    try {
-        const {
-            fullName,
-            fatherName,
-            iqamaNumber,
-            email,
-            country,
-            bloodGroup,
-            age,
-            gender,
-            termsAccepted,
-        } = req.body;
-
-        if (!termsAccepted || termsAccepted !== "true") {
-            return res.status(400).json({ error: "You must accept the terms." });
-        }
-
-        const newUser = new User({
-            fullName,
-            fatherName,
-            iqamaNumber,
-            email,
-            country,
-            bloodGroup,
-            photo: req.file ? req.file.path : null,
-            age,
-            gender,
-            termsAccepted: termsAccepted === "true",
-        });
-
-
-        await newUser.save();
-        res.status(201).json({ message: "User registered successfully!", user: newUser });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Failed to register user." });
-    }
-} */
 
 
 
 export const userLogin = async (req, res) => {
     try {
-        const { iqamaNumber } = req.body;
+        const { iqamaNumber, AdharNumber } = req.body;
 
-        if (!iqamaNumber) {
-            return res.status(400).json({ error: "Iqama number is required." });
+        if (!iqamaNumber && !AdharNumber) {
+            return res.status(400).json({ error: "Iqama number or Adhar number is required." });
         }
 
-        const user = await User.findOne({ iqamaNumber });
+        const user = await User.findOne({
+            $or: [{ iqamaNumber }, { AdharNumber }]
+        });
 
         if (!user) {
             return res.status(404).json({ error: "User not found." });
         }
 
-        const token = generateToken(user._id)
+        const token = generateToken(user._id);
 
         res.status(200).json({
             message: "Login successful!",
-            user: user,
-            token: token
+            user,
+            token
         });
     } catch (error) {
         console.error(error);
@@ -72,25 +32,3 @@ export const userLogin = async (req, res) => {
     }
 };
 
-
-
-
-export const getUserProfileByIqamaNumber = async (req, res) => {
-    try {
-        const { iqamaNumber } = req.params;
-
-        const profile = await Profile.findOne({ iqamaNumber });
-
-        if (!profile) {
-            return res.status(404).json({ message: 'Profile not found' });
-        }
-
-        res.status(200).json({
-            message: 'Profile retrieved successfully',
-            profile,
-        });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error retrieving profile', error });
-    }
-};

@@ -93,4 +93,46 @@ export const getExpiredProfiles = async (req, res) => {
 
 
 
+export const searchUsers = async (req, res) => {
+    try {
+        const { query } = req.query;
+
+        if (!query) {
+            return res.status(400).json({
+                error: "Please provide a search query (name or iqama number).",
+            });
+        }
+
+        const isNumber = !isNaN(query);
+
+        const users = await User.find(
+            isNumber
+                ? { iqamaNumber: query }
+                : { Name: { $regex: query, $options: "i" } }
+        );
+
+        if (users.length === 0) {
+            return res.status(404).json({
+                message: "No users found with the provided query.",
+            });
+        }
+
+        res.status(200).json({
+            message: "Users retrieved successfully.",
+            users,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: "Failed to search users.",
+        });
+    }
+};
+
+
+
+
+
+
+
 
