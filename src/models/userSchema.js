@@ -21,7 +21,8 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['Pending', 'Received', 'Completed'],
         required: true
-    }, ApprovalStatus: { type: String, required: true, enum: ['Approved', 'Rejected', 'Pending'] },
+    },
+    ApprovalStatus: { type: String, required: true, enum: ['Approved', 'Rejected', 'Pending'] },
     Nominee: { type: String, required: true },
     CreatedBy: { type: String, required: true },
     AreaCoordinator: { type: String, required: true },

@@ -51,6 +51,50 @@ export const profileCreation = async (req, res) => {
 
 
 
+export const updateProfile = async (req, res) => {
+    try {
+        const user = await User.findByIdAndUpdate(req.params.id, req.body, { new: true });
+
+        res.status(200).json({
+            message: "Profile updated successfully!",
+            profile: user
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: "Failed to update profile.",
+        });
+    }
+};
+
+
+
+
+export const deleteProfile = async (req, res) => {
+    try {
+        const user = await User.findByIdAndDelete(req.params.id);
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found. Unable to delete profile.",
+            });
+        }
+
+        res.status(200).json({
+            message: "Profile deleted successfully!",
+        });
+    } catch (error) {
+        console.error("Error deleting profile:", error);
+        res.status(500).json({
+            error: "An error occurred while deleting the profile. Please try again later.",
+        });
+    }
+};
+
+
+
+
+
 
 
 
@@ -66,6 +110,34 @@ export const getProfiles = async (req, res) => {
         res.status(500).json({ message: 'Error retrieving user profile', error });
     }
 }
+
+
+
+
+export const getProfileById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const profile = await User.findById(id);
+
+        if (!profile) {
+            return res.status(404).json({
+                message: "User profile not found.",
+            });
+        }
+
+        res.status(200).json({
+            message: "User profile retrieved successfully.",
+            data: profile,
+        });
+    } catch (error) {
+        console.error("Error retrieving user profile:", error);
+        res.status(500).json({
+            message: "Error retrieving user profile.",
+            error,
+        });
+    }
+};
+
 
 
 
