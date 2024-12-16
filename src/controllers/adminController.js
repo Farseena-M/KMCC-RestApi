@@ -28,12 +28,15 @@ export const adminLogin = async (req, res) => {
 export const profileCreation = async (req, res) => {
     try {
 
-        const iqamaNumber = req.body.iqamaNumber
-        const existingUser = await User.findOne({ iqamaNumber });
+        const { iqamaNumber, AdharNumber } = req.body;
+
+        const existingUser = await User.findOne({
+            $or: [{ iqamaNumber }, { AdharNumber }]
+        });
 
         if (existingUser) {
             return res.status(400).json({
-                error: "User with this Iqama Number already exists.",
+                error: "User with this IQAMA or ADHAR number already exists.",
             });
         }
         const user = await User.create(req.body)
