@@ -206,6 +206,75 @@ export const searchUsers = async (req, res) => {
 
 
 
+//DASHBOARD SECTION
+
+
+
+
+export const getTotalUsers = async (req, res) => {
+    try {
+        const totalUsers = await User.countDocuments();
+        res.status(200).json({
+            totalUsers
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: "Failed to retrieve total users.",
+        });
+    }
+}
+
+
+export const getExpiredProfilesCount = async (req, res) => {
+    try {
+        const currentDate = new Date();
+
+        const expiredProfilesCount = await User.countDocuments({
+            expiryDate: { $lt: currentDate },
+        });
+
+        res.status(200).json({
+            message: "Expired profiles count retrieved successfully.",
+            expiredProfilesCount,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: "Failed to retrieve expired profiles count.",
+        });
+    }
+};
+
+
+
+export const getRemainingUsersCount = async (req, res) => {
+    try {
+        const currentDate = new Date();
+
+        const totalUsers = await User.countDocuments();
+
+        const expiredProfilesCount = await User.countDocuments({
+            expiryDate: { $lt: currentDate },
+        });
+
+        const remainingUsersCount = totalUsers - expiredProfilesCount;
+
+        res.status(200).json({
+            message: "Remaining users count retrieved successfully.",
+            remainingUsersCount,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: "Failed to retrieve remaining users count.",
+        });
+    }
+};
+
+
+
+
 
 
 
