@@ -1,26 +1,73 @@
+import Admin from "../models/adminSchema.js";
 import User from "../models/userSchema.js";
-import jwt from 'jsonwebtoken';
+import { generateTokenAdmin } from "../utils/generateToken.js";
+
+
+export const adminSignup = async (req, res) => {
+    try {
+        const { name, email, password } = req.body
+        const Exist = await Admin.findOne({ email })
+        if (Exist) {
+            return res.status(409).json({
+                error: 'User already exists'
+            })
+        }
+        const newUser = new Admin({
+            name,
+            email,
+            password,
+            role: 'admin'
+        })
+        await newUser.save()
+        return res.status(201).json({
+            status: 'Register Success',
+            data: {
+                name: newUser.name,
+                email: newUser.email,
+                role: newUser.role
+            }
+        })
+    } catch (error) {
+        return res.status(500).json({
+            status: "failure",
+            message: "Something went wrong...!",
+            error: error.message
+        })
+    }
+}
+
+
+
 
 
 export const adminLogin = async (req, res) => {
-    const { email, password } = req.body;
+    try {
+        const { email, password } = req.body;
 
-    if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
-        const token = jwt.sign({ email, role: 'admin' }, process.env.ADMIN_JWT_SECRET, {
-            expiresIn: process.env.LOGIN_EXPIRES
-        });
+        if (!email && !password) {
+            return res.status(401).json({ message: 'Invalid email or password' });
+        }
+        const admin = await Admin.findOne({ email }).select('+password');
+
+        if (!admin || !(await admin.comparePasswordInDb(password, admin.password))) {
+            return res.status(404).json({ message: 'Incorrect email or password' })
+        }
+        const token = generateTokenAdmin(admin._id);
         return res.status(200).json({
-            message: 'Login success',
-            role: 'admin',
-            token
-        });
-    } else {
-        return res.status(404).json({
-            status: 'Not found',
-            message: 'Invalid admin credentials'
-        });
+            message: 'Login Success',
+            token,
+            data: admin._id,
+            role: 'admin'
+        })
+    } catch (error) {
+        return res.status(500).json({
+            status: "failure",
+            message: "Something went wrong...!",
+            error: error.message
+        })
     }
 }
+
 
 
 

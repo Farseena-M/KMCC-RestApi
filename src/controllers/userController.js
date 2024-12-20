@@ -1,5 +1,5 @@
 import User from "../models/userSchema.js";
-import generateToken from "../utils/generateToken.js";
+import { generateTokenUser } from "../utils/generateToken.js";
 
 
 
@@ -19,7 +19,7 @@ export const userLogin = async (req, res) => {
             return res.status(404).json({ error: "User not found." });
         }
 
-        const token = generateToken(user._id);
+        const token = generateTokenUser(user._id);
 
         res.status(200).json({
             message: "Login successful!",

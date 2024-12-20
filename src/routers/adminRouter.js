@@ -1,10 +1,11 @@
 import express from 'express';
-import { adminLogin, deleteProfile, getExpiredProfiles, getExpiredProfilesCount, getProfileById, getProfiles, getRemainingUsersCount, getTotalUsers, profileCreation, searchUsers, updateProfile } from '../controllers/adminController.js';
+import { adminLogin, adminSignup, deleteProfile, getExpiredProfiles, getExpiredProfilesCount, getProfileById, getProfiles, getRemainingUsersCount, getTotalUsers, profileCreation, searchUsers, updateProfile } from '../controllers/adminController.js';
 import { Protect, restrict } from '../middlewares/verifyToken.js';
 import UploadImage from '../middlewares/uploadImage.js';
 
 const adminRouter = express.Router()
 
+adminRouter.post('/signup', adminSignup)
 adminRouter.post('/login', adminLogin)
 adminRouter.post('/user-profile', Protect, restrict(['admin']), UploadImage, profileCreation)
 adminRouter.get('/user-profile', Protect, restrict(['admin']), getProfiles)
