@@ -24,6 +24,7 @@ export const adminSignup = async (req, res) => {
             data: {
                 name: newUser.name,
                 email: newUser.email,
+                password: newUser.password,
                 role: newUser.role
             }
         })
