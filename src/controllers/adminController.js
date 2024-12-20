@@ -75,19 +75,23 @@ export const adminLogin = async (req, res) => {
 
 export const getAllAdmins = async (req, res) => {
     try {
-        const admins = await Admin.find()
+        const loggedAdminId = req.user._id;
+
+        const admins = await Admin.find({ _id: { $ne: loggedAdminId } });
+
         return res.status(200).json({
-            message: 'Fetch admins Successfully',
+            message: 'Fetch admins successfully',
             data: admins
-        })
+        });
     } catch (error) {
         return res.status(500).json({
             status: "failure",
             message: "Something went wrong...!",
             error: error.message
-        })
+        });
     }
-}
+};
+
 
 
 
