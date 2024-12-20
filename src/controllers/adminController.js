@@ -73,6 +73,46 @@ export const adminLogin = async (req, res) => {
 
 
 
+export const getAllAdmins = async (req, res) => {
+    try {
+        const admins = await Admin.find()
+        return res.status(200).json({
+            message: 'Fetch admins Successfully',
+            data: admins
+        })
+    } catch (error) {
+        return res.status(500).json({
+            status: "failure",
+            message: "Something went wrong...!",
+            error: error.message
+        })
+    }
+}
+
+
+
+
+
+export const deleteAdmin = async (req, res) => {
+    try {
+        const { id } = req.params
+        await Admin.findByIdAndDelete(id)
+        return res.status(200).json({
+            message: 'Admin deleted Successfully',
+        })
+    } catch (error) {
+        return res.status(500).json({
+            status: "failure",
+            message: "Something went wrong...!",
+            error: error.message
+        })
+    }
+}
+
+
+
+
+
 export const profileCreation = async (req, res) => {
     try {
 

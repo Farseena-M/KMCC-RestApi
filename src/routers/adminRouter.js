@@ -1,5 +1,5 @@
 import express from 'express';
-import { adminLogin, adminSignup, deleteProfile, getExpiredProfiles, getExpiredProfilesCount, getProfileById, getProfiles, getRemainingUsersCount, getTotalUsers, profileCreation, searchUsers, updateProfile } from '../controllers/adminController.js';
+import { adminLogin, adminSignup, deleteAdmin, deleteProfile, getAllAdmins, getExpiredProfiles, getExpiredProfilesCount, getProfileById, getProfiles, getRemainingUsersCount, getTotalUsers, profileCreation, searchUsers, updateProfile } from '../controllers/adminController.js';
 import { Protect, restrict } from '../middlewares/verifyToken.js';
 import UploadImage from '../middlewares/uploadImage.js';
 
@@ -17,6 +17,8 @@ adminRouter.get('/user/:id', Protect, restrict(['admin']), getProfileById)
 adminRouter.get('/users', Protect, restrict(['admin']), getTotalUsers)
 adminRouter.get('/expired/users', Protect, restrict(['admin']), getExpiredProfilesCount)
 adminRouter.get('/remainingusers', Protect, restrict(['admin']), getRemainingUsersCount)
+adminRouter.get('/all-admins', Protect, restrict(['admin']), getAllAdmins)
+adminRouter.delete('/:id', Protect, restrict(['admin']), deleteAdmin)
 
 
 export default adminRouter;
