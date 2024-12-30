@@ -11,6 +11,12 @@ const adminSchema = new mongoose.Schema({
         required: [true, 'Email is required'],
         lowercase: true,
     },
+    phone: {
+        type: Number
+    },
+    photo: {
+        type: String
+    },
     password: {
         type: String,
         required: [true, 'Password is Required'],

@@ -1,6 +1,8 @@
 import Admin from "../models/adminSchema.js";
 import User from "../models/userSchema.js";
 import { generateTokenAdmin } from "../utils/generateToken.js";
+import { v2 as cloudinary } from 'cloudinary';
+
 
 
 export const adminSignup = async (req, res) => {
@@ -365,10 +367,71 @@ export const getRemainingUsersCount = async (req, res) => {
 };
 
 
+export const getAdminProfile = async (req, res) => {
+    try {
+        const adminId = req.params.id;
+
+        const admin = await Admin.findById(adminId);
+
+        if (!admin) return res.status(404).json({ error: "Admin not found" });
+
+        return res.status(200).json({
+            message: "Admin profile fetched successfully",
+            admin,
+        });
+    } catch (error) {
+        console.error("Error in getAdminProfile: ", error.message);
+        return res.status(500).json({
+            status: "failure",
+            message: "Something went wrong...!",
+            error: error.message,
+        });
+    }
+};
 
 
 
 
 
+export const updateAdminProfile = async (req, res) => {
+    try {
+        const adminId = req.params.id;
+        const { name, email, photo, phone } = req.body;
+
+        let admin = await Admin.findById(adminId);
+
+        if (!admin) return res.status(404).json({ error: "Admin not found" });
+
+        if (req.user._id !== adminId) {
+            return res.status(403).json({
+                error: "Unauthorized: You cannot update another admin's profile",
+            });
+        }
+
+        if (photo && admin.photo) {
+            const publicId = admin.photo.split('/').pop().split('.')[0];
+            await cloudinary.uploader.destroy(publicId);
+        }
+
+        admin.name = name || admin.name;
+        admin.email = email || admin.email;
+        admin.phone = phone || admin.phone;
+        admin.photo = photo || admin.photo;
+
+        const updatedAdmin = await admin.save();
+
+        return res.status(200).json({
+            message: "Profile updated successfully",
+            admin: updatedAdmin,
+        });
+    } catch (error) {
+        console.error("Error in updateAdminProfile: ", error.message);
+        return res.status(500).json({
+            status: "failure",
+            message: "Something went wrong...!",
+            error: error.message,
+        });
+    }
+};
 
 

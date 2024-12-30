@@ -38,7 +38,8 @@ const UploadImage = (req, res, next) => {
                 const result = await cloudinary.uploader.upload(req.file.path, {
                     folder: 'Images',
                 });
-                req.body.image = result.secure_url;
+
+                req.body.photo = result.secure_url;
 
                 fs.unlink(req.file.path, (unlinkError) => {
                     if (unlinkError) {
