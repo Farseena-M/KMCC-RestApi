@@ -1,5 +1,5 @@
 import express from 'express';
-import { adminLogin, adminSignup, deleteAdmin, deleteProfile, getAdminProfile, getAllAdmins, getExpiredProfiles, getExpiredProfilesCount, getProfileById, getProfiles, getRemainingUsersCount, getTotalUsers, profileCreation, searchUsers, updateAdminProfile, updateProfile } from '../controllers/adminController.js';
+import { adminLogin, adminSignup, approveAdmin, deleteAdmin, deleteProfile, getAdminProfile, getAllAdmins, getExpiredProfiles, getExpiredProfilesCount, getPendingAdmins, getProfileById, getProfiles, getRemainingUsersCount, getTotalUsers, profileCreation, rejectAdmin, searchUsers, updateAdminProfile, updateProfile } from '../controllers/adminController.js';
 import { Protect, restrict } from '../middlewares/verifyToken.js';
 import UploadImage from '../middlewares/uploadImage.js';
 
@@ -7,6 +7,9 @@ const adminRouter = express.Router()
 
 adminRouter.post('/signup', adminSignup)
 adminRouter.post('/login', adminLogin)
+adminRouter.get('/pending-requests', Protect, restrict(['admin']), getPendingAdmins)
+adminRouter.post('/approve/:pendingAdminId', Protect, restrict(['admin']), approveAdmin);
+adminRouter.delete('/reject/:pendingAdminId', Protect, restrict(['admin']), rejectAdmin);
 adminRouter.post('/user-profile', Protect, restrict(['admin']), UploadImage, profileCreation)
 adminRouter.get('/user-profile', Protect, restrict(['admin']), getProfiles)
 adminRouter.get('/profiles/sorted', Protect, restrict(['admin']), getExpiredProfiles)

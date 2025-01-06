@@ -2,42 +2,121 @@ import Admin from "../models/adminSchema.js";
 import User from "../models/userSchema.js";
 import { generateTokenAdmin } from "../utils/generateToken.js";
 import { v2 as cloudinary } from 'cloudinary';
+import PendingAdmin from '../models/pendingAdminSchema.js';
+
 
 
 
 export const adminSignup = async (req, res) => {
     try {
-        const { name, email, password } = req.body
-        const Exist = await Admin.findOne({ email })
-        if (Exist) {
+        const { name, email, password } = req.body;
+
+        const existingAdmin = await Admin.findOne({ email });
+        const pendingAdmin = await PendingAdmin.findOne({ email });
+
+        if (existingAdmin || pendingAdmin) {
             return res.status(409).json({
-                error: 'User already exists'
-            })
+                error: 'Admin already exists or is awaiting approval'
+            });
         }
-        const newUser = new Admin({
-            name,
-            email,
-            password,
-            role: 'admin'
-        })
-        await newUser.save()
+
+        const newAdminRequest = new PendingAdmin({ name, email, password, role: 'admin' });
+        await newAdminRequest.save();
+
         return res.status(201).json({
-            status: 'Register Success',
-            data: {
-                name: newUser.name,
-                email: newUser.email,
-                password: newUser.password,
-                role: newUser.role
-            }
-        })
+            status: 'Signup request submitted successfully. Await admin approval.',
+            data: { name, email }
+        });
     } catch (error) {
         return res.status(500).json({
             status: "failure",
             message: "Something went wrong...!",
             error: error.message
-        })
+        });
     }
-}
+};
+
+
+
+export const getPendingAdmins = async (req, res) => {
+    try {
+        const pendingAdmins = await PendingAdmin.find()
+        return res.status(200).json({
+            status: "success",
+            message: "Pending admins fetched successfully.",
+            data: pendingAdmins
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: "failure",
+            message: "Error Fetching Pending Admins...!",
+            error: error.message
+        });
+    }
+};
+
+
+
+
+
+export const approveAdmin = async (req, res) => {
+    try {
+        const { pendingAdminId } = req.params;
+
+        const pendingAdmin = await PendingAdmin.findById(pendingAdminId);
+
+        if (!pendingAdmin) {
+            return res.status(404).json({ message: 'Pending admin not found' });
+        }
+
+        const newAdmin = new Admin({
+            name: pendingAdmin.name,
+            email: pendingAdmin.email,
+            phone: pendingAdmin.phone,
+            photo: pendingAdmin.photo,
+            password: pendingAdmin.password,
+            role: pendingAdmin.role
+        });
+        await newAdmin.save();
+
+        await pendingAdmin.deleteOne();
+
+        return res.status(200).json({
+            message: 'Admin approved successfully',
+            data: { name: newAdmin.name, email: newAdmin.email }
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: "failure",
+            message: "Something went wrong...!",
+            error: error.message
+        });
+    }
+};
+
+
+
+
+export const rejectAdmin = async (req, res) => {
+    try {
+        const { pendingAdminId } = req.params;
+
+        const pendingAdmin = await PendingAdmin.findByIdAndDelete(pendingAdminId);
+        if (!pendingAdmin) {
+            return res.status(404).json({ message: 'Pending admin not found' });
+        }
+
+        return res.status(200).json({
+            message: 'Admin request rejected successfully'
+        });
+    } catch (error) {
+        return res.status(500).json({
+            status: "failure",
+            message: "Something went wrong...!",
+            error: error.message
+        });
+    }
+};
 
 
 
