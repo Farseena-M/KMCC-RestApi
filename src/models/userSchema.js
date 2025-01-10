@@ -35,7 +35,6 @@ const userSchema = new mongoose.Schema({
         type: Date,
         default: null
     },
-    photo: { type: String },
     email: {
         type: String,
         match: [/\S+@\S+\.\S+/, 'Please provide a valid email address'],

@@ -1,3 +1,4 @@
+import ImageSchema from "../models/ImageSchema.js";
 import User from "../models/userSchema.js";
 import { generateTokenUser } from "../utils/generateToken.js";
 
@@ -29,6 +30,27 @@ export const userLogin = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: "Login failed. Please try again." });
+    }
+};
+
+
+
+export const getImages = async (req, res) => {
+
+    try {
+        const images = await ImageSchema.find();
+
+        res.status(200).json({
+            message: "Images fetched successfully!",
+            images,
+        });
+    } catch (error) {
+        console.error("Error fetching images:", error);
+
+        res.status(500).json({
+            message: "Failed to fetch images.",
+            error: error.message,
+        });
     }
 };
 

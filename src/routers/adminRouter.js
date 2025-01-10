@@ -1,5 +1,5 @@
 import express from 'express';
-import { adminLogin, adminSignup, approveAdmin, deleteAdmin, deleteProfile, getAdminProfile, getAllAdmins, getExpiredProfiles, getExpiredProfilesCount, getPendingAdmins, getProfileById, getProfiles, getRemainingUsersCount, getTotalUsers, profileCreation, rejectAdmin, searchUsers, updateAdminProfile, updateProfile } from '../controllers/adminController.js';
+import { adminLogin, adminSignup, approveAdmin, deleteAdmin, deleteImage, deleteProfile, galleryCreation, getAdminProfile, getAllAdmins, getExpiredProfiles, getExpiredProfilesCount, getImages, getPendingAdmins, getProfileById, getProfiles, getRemainingUsersCount, getTotalUsers, profileCreation, rejectAdmin, searchUsers, updateAdminProfile, updateProfile } from '../controllers/adminController.js';
 import { Protect, restrict } from '../middlewares/verifyToken.js';
 import UploadImage from '../middlewares/uploadImage.js';
 
@@ -24,6 +24,9 @@ adminRouter.get('/all-admins', Protect, restrict(['admin']), getAllAdmins)
 adminRouter.delete('/:id', Protect, restrict(['admin']), deleteAdmin)
 adminRouter.get('/:id', Protect, restrict(['admin']), getAdminProfile)
 adminRouter.patch('/profile/:id', Protect, restrict(['admin']), UploadImage, updateAdminProfile)
+adminRouter.post('/upload-image', Protect, restrict(['admin']), UploadImage, galleryCreation)
+adminRouter.delete('/image/:id', Protect, restrict(['admin']), deleteImage)
+adminRouter.get('/upload/images', Protect, restrict(['admin']), getImages);
 
 
 export default adminRouter;

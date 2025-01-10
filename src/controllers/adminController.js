@@ -3,6 +3,8 @@ import User from "../models/userSchema.js";
 import { generateTokenAdmin } from "../utils/generateToken.js";
 import { v2 as cloudinary } from 'cloudinary';
 import PendingAdmin from '../models/pendingAdminSchema.js';
+import ImageSchema from "../models/ImageSchema.js";
+import mongoose from "mongoose";
 
 
 
@@ -317,6 +319,98 @@ export const getProfileById = async (req, res) => {
 
 
 
+
+
+
+
+export const galleryCreation = async (req, res) => {
+    try {
+        const { photo } = req.body;
+
+        if (!photo) {
+            return res.status(400).json({
+                error: "Image is required for gallery creation.",
+            });
+        }
+
+        const createGallery = await ImageSchema.create({ photo });
+
+        res.status(201).json({
+            message: "Gallery created successfully!",
+            image: createGallery,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: "Failed to create gallery.",
+        });
+    }
+};
+
+
+
+
+export const deleteImage = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        if (!id) {
+            return res.status(400).json({
+                error: "Image ID is required for deletion.",
+            });
+        }
+
+        const deletedImage = await ImageSchema.findByIdAndDelete(id);
+
+        if (!deletedImage) {
+            return res.status(404).json({
+                error: "Image not found.",
+            });
+        }
+
+        res.status(200).json({
+            message: "Image deleted successfully!",
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            error: "Failed to delete image.",
+        });
+    }
+};
+
+
+
+
+
+
+export const getImages = async (req, res) => {
+
+    try {
+        const images = await ImageSchema.find();
+
+        res.status(200).json({
+            message: "Images fetched successfully!",
+            images,
+        });
+    } catch (error) {
+        console.error("Error fetching images:", error);
+
+        res.status(500).json({
+            message: "Failed to fetch images.",
+            error: error.message,
+        });
+    }
+};
+
+
+
+
+
+
+
+
+
 export const getExpiredProfiles = async (req, res) => {
     try {
         const { order = "asc" } = req.query;
@@ -449,6 +543,10 @@ export const getRemainingUsersCount = async (req, res) => {
 export const getAdminProfile = async (req, res) => {
     try {
         const adminId = req.params.id;
+
+        if (!mongoose.Types.ObjectId.isValid(adminId)) {
+            return res.status(400).json({ error: "Invalid admin ID format" });
+        }
 
         const admin = await Admin.findById(adminId);
 
